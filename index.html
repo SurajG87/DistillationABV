@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Spirit Dilution Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --success: #27ae60;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --gradient: linear-gradient(135deg, #2c3e50 0%, #4a6491 100%);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 18px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            margin-bottom: 15px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 15px 10px;
+            background: var(--gradient);
+            border-radius: 12px;
+            color: white;
+            margin-bottom: 15px;
+        }
+        
+        header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .calculator-card {
+            border-left: 4px solid var(--secondary);
+        }
+        
+        .section-title {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            padding: 5px 0;
+        }
+        
+        .section-title i {
+            color: var(--secondary);
+        }
+        
+        .section-title .chevron {
+            transition: transform 0.3s;
+            color: var(--primary);
+        }
+        
+        .input-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 350px) {
+            .input-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .input-container {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--primary);
+            font-size: 0.9rem;
+        }
+        
+        .input-with-unit {
+            position: relative;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px 12px;
+            border: 1.5px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.2s;
+            background: white;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        
+        /* Remove arrow keys from number input */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        
+        input:focus, select:focus {
+            border-color: var(--secondary);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
+        .unit {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .input-info {
+            font-size: 0.75rem;
+            color: #666;
+            margin-top: 4px;
+            font-style: italic;
+        }
+        
+        .results-card {
+            border-left: 4px solid var(--success);
+        }
+        
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .result-box {
+            background: var(--light);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+        
+        .result-label {
+            font-size: 0.8rem;
+            color: var(--primary);
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+        
+        .result-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .result-unit {
+            font-size: 0.85rem;
+            color: var(--secondary);
+            margin-left: 3px;
+        }
+        
+        .result-detail {
+            font-size: 0.75rem;
+            color: #666;
+            margin-top: 4px;
+        }
+        
+        .water-type-info {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+        }
+        
+        .compact-chart {
+            height: 120px;
+            margin-top: 15px;
+        }
+        
+        .reset-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--light);
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 10px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .reset-btn:hover {
+            background: #e0e0e0;
+        }
+        
+        /* Dropdown sections */
+        .dropdown-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        
+        .dropdown-content.expanded {
+            max-height: 800px;
+        }
+        
+        .guide-card {
+            border-left: 4px solid var(--accent);
+        }
+        
+        .notes-card {
+            border-left: 4px solid #ffb300;
+            background: #fff8e1;
+        }
+        
+        .steps-list {
+            list-style-type: none;
+            counter-reset: step-counter;
+            padding-top: 10px;
+        }
+        
+        .steps-list li {
+            counter-increment: step-counter;
+            margin-bottom: 15px;
+            padding-left: 35px;
+            position: relative;
+            line-height: 1.4;
+            font-size: 0.85rem;
+        }
+        
+        .steps-list li:before {
+            content: counter(step-counter);
+            background: var(--secondary);
+            color: white;
+            font-weight: bold;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            left: 0;
+            top: 0;
+            font-size: 0.8rem;
+        }
+        
+        .notes-content {
+            padding-top: 10px;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+        
+        .note-item {
+            margin-bottom: 10px;
+            display: flex;
+            gap: 8px;
+        }
+        
+        .note-item i {
+            color: #e65100;
+            margin-top: 2px;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 10px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.75rem;
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .instagram-link {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+        
+        .instagram-link:hover {
+            text-decoration: underline;
+        }
+        
+        .instagram-icon {
+            color: #E1306C;
+        }
+        
+        .copyright {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 3px;
+        }
+        
+        .highlight {
+            background: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-wine-bottle"></i> Spirit Dilution Calculator 🐑</h1>
+        </header>
+        
+        <div class="card calculator-card">
+            <h2 class="section-title"><i class="fas fa-calculator"></i> Calculator</h2>
+            
+            <div class="input-grid">
+                <div class="input-container">
+                    <label for="initial-abv">Initial ABV</label>
+                    <div class="input-with-unit">
+                        <input type="number" id="initial-abv" min="20" max="95" step="0.1" placeholder="e.g., 75" inputmode="decimal">
+                        <span class="unit">%</span>
+                    </div>
+                    <div class="input-info">Distillate strength</div>
+                </div>
+                
+                <div class="input-container">
+                    <label for="initial-volume">Initial Volume</label>
+                    <div class="input-with-unit">
+                        <input type="number" id="initial-volume" min="10" step="1" placeholder="e.g., 200" inputmode="decimal">
+                        <span class="unit">mL</span>
+                    </div>
+                    <div class="input-info">Volume of distillate</div>
+                </div>
+                
+                <div class="input-container">
+                    <label for="target-abv">Target ABV</label>
+                    <div class="input-with-unit">
+                        <input type="number" id="target-abv" min="10" max="60" step="0.1" placeholder="e.g., 40" inputmode="decimal">
+                        <span class="unit">%</span>
+                    </div>
+                    <div class="input-info">Desired strength</div>
+                </div>
+                
+                <div class="input-container">
+                    <label for="water-type">Water Type</label>
+                    <select id="water-type">
+                        <option value="distilled">Distilled Water</option>
+                        <option value="filtered">Filtered Water</option>
+                        <option value="spring">Spring Water</option>
+                    </select>
+                    <div class="input-info">For clarity</div>
+                </div>
+            </div>
+            
+            <button class="reset-btn" id="reset-btn">
+                <i class="fas fa-redo"></i> Reset to Default
+            </button>
+        </div>
+        
+        <div class="card results-card">
+            <h2 class="section-title"><i class="fas fa-chart-bar"></i> Results</h2>
+            
+            <div class="results-grid">
+                <div class="result-box">
+                    <div class="result-label">Water to Add</div>
+                    <div class="result-value" id="water-result">0<span class="result-unit">mL</span></div>
+                    <div class="result-detail" id="water-cups">0 cups</div>
+                </div>
+                
+                <div class="result-box">
+                    <div class="result-label">Final Volume</div>
+                    <div class="result-value" id="volume-result">0<span class="result-unit">mL</span></div>
+                    <div class="result-detail" id="volume-bottles">0 bottles</div>
+                </div>
+                
+                <div class="result-box">
+                    <div class="result-label">ABV Reduction</div>
+                    <div class="result-value" id="reduction-result">0<span class="result-unit">%</span></div>
+                    <div class="result-detail" id="reduction-detail">Strength decrease</div>
+                </div>
+                
+                <div class="result-box">
+                    <div class="result-label">Dilution Ratio</div>
+                    <div class="result-value" id="ratio-result">0:0</div>
+                    <div class="result-detail" id="ratio-detail">Spirit:Water</div>
+                </div>
+            </div>
+            
+            <div class="water-type-info">
+                <i class="fas fa-info-circle"></i> Using <span id="water-type-display">distilled</span> water
+            </div>
+            
+            <div class="compact-chart">
+                <canvas id="dilutionChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="card guide-card">
+            <h2 class="section-title" id="guide-toggle">
+                <div>
+                    <i class="fas fa-list-ol"></i> Step-by-Step Guide
+                </div>
+                <i class="fas fa-chevron-down chevron" id="guide-chevron"></i>
+            </h2>
+            
+            <div class="dropdown-content" id="guide-content">
+                <ol class="steps-list">
+                    <li><strong>Measure your distillate</strong> precisely using a graduated cylinder</li>
+                    <li><strong>Chill both distillate and water</strong> to prevent louche effect (cloudiness)</li>
+                    <li><strong>Add <span class="highlight" id="step-water">0 mL</span> of <span id="step-water-type">distilled</span> water</strong> slowly in stages</li>
+                    <li><strong>Stir gently but thoroughly</strong> after each water addition</li>
+                    <li><strong>Let the mixture rest</strong> for 24-48 hours in a sealed container</li>
+                    <li><strong>Check final ABV</strong> with an alcoholmeter for verification</li>
+                    <li><strong>Filter if cloudy</strong> through coffee filter or activated carbon</li>
+                    <li><strong>Age if desired</strong> to allow flavors to marry</li>
+                </ol>
+            </div>
+        </div>
+        
+        <div class="card notes-card">
+            <h2 class="section-title" id="notes-toggle">
+                <div>
+                    <i class="fas fa-exclamation-triangle"></i> Important Notes
+                </div>
+                <i class="fas fa-chevron-down chevron" id="notes-chevron"></i>
+            </h2>
+            
+            <div class="dropdown-content" id="notes-content">
+                <div class="notes-content">
+                    <div class="note-item">
+                        <i class="fas fa-cloud"></i>
+                        <div><strong>Louche Effect:</strong> High-proof distillates may turn cloudy when diluted. Use distilled water and dilute in stages to minimize this.</div>
+                    </div>
+                    <div class="note-item">
+                        <i class="fas fa-clock"></i>
+                        <div><strong>Resting Period:</strong> Always let diluted spirit rest for 24-48 hours before final filtration or bottling.</div>
+                    </div>
+                    <div class="note-item">
+                        <i class="fas fa-thermometer-half"></i>
+                        <div><strong>Temperature:</strong> Measure ABV at 20°C (68°F) for accurate readings.</div>
+                    </div>
+                    <div class="note-item">
+                        <i class="fas fa-balance-scale"></i>
+                        <div><strong>Legal Compliance:</strong> Ensure you comply with local regulations regarding alcohol production and distillation.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <div>For educational purposes only. Drink responsibly. 🐑</div>
+            <div class="copyright">© <a href="https://www.instagram.com/suraj.gurung87/" class="instagram-link" target="_blank">
+                <i class="fab fa-instagram instagram-icon"></i> suraj.gurung87
+            </a></div>
+        </footer>
+    </div>
+
+    <script>
+        // DOM Elements
+        const initialAbv = document.getElementById('initial-abv');
+        const initialVolume = document.getElementById('initial-volume');
+        const targetAbv = document.getElementById('target-abv');
+        const waterType = document.getElementById('water-type');
+        const resetBtn = document.getElementById('reset-btn');
+        
+        // Results elements
+        const waterResult = document.getElementById('water-result');
+        const volumeResult = document.getElementById('volume-result');
+        const reductionResult = document.getElementById('reduction-result');
+        const ratioResult = document.getElementById('ratio-result');
+        const waterCups = document.getElementById('water-cups');
+        const volumeBottles = document.getElementById('volume-bottles');
+        const waterTypeDisplay = document.getElementById('water-type-display');
+        
+        // Step-by-step elements
+        const stepWater = document.getElementById('step-water');
+        const stepWaterType = document.getElementById('step-water-type');
+        
+        // Dropdown toggles
+        const guideToggle = document.getElementById('guide-toggle');
+        const guideContent = document.getElementById('guide-content');
+        const guideChevron = document.getElementById('guide-chevron');
+        
+        const notesToggle = document.getElementById('notes-toggle');
+        const notesContent = document.getElementById('notes-content');
+        const notesChevron = document.getElementById('notes-chevron');
+        
+        // Chart
+        let dilutionChart = null;
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-calculate when inputs change
+            initialAbv.addEventListener('input', calculateDilution);
+            initialVolume.addEventListener('input', calculateDilution);
+            targetAbv.addEventListener('input', calculateDilution);
+            waterType.addEventListener('change', updateWaterType);
+            
+            // Setup dropdown toggles
+            guideToggle.addEventListener('click', function() {
+                guideContent.classList.toggle('expanded');
+                if (guideContent.classList.contains('expanded')) {
+                    guideChevron.className = 'fas fa-chevron-up chevron';
+                } else {
+                    guideChevron.className = 'fas fa-chevron-down chevron';
+                }
+            });
+            
+            notesToggle.addEventListener('click', function() {
+                notesContent.classList.toggle('expanded');
+                if (notesContent.classList.contains('expanded')) {
+                    notesChevron.className = 'fas fa-chevron-up chevron';
+                } else {
+                    notesChevron.className = 'fas fa-chevron-down chevron';
+                }
+            });
+            
+            // Reset button
+            resetBtn.addEventListener('click', function() {
+                initialAbv.value = '';
+                initialVolume.value = '';
+                targetAbv.value = '';
+                waterType.value = 'distilled';
+                updateWaterType();
+                
+                // Reset results
+                waterResult.innerHTML = '0<span class="result-unit">mL</span>';
+                volumeResult.innerHTML = '0<span class="result-unit">mL</span>';
+                reductionResult.innerHTML = '0<span class="result-unit">%</span>';
+                ratioResult.textContent = '0:0';
+                waterCups.textContent = '0 cups';
+                volumeBottles.textContent = '0 bottles';
+                stepWater.textContent = '0 mL';
+                
+                // Reset chart
+                if (dilutionChart) {
+                    dilutionChart.destroy();
+                    dilutionChart = null;
+                }
+            });
+            
+            updateWaterType();
+        });
+        
+        // Update water type display
+        function updateWaterType() {
+            const type = waterType.options[waterType.selectedIndex].text.split(' ')[0].toLowerCase();
+            waterTypeDisplay.textContent = type;
+            stepWaterType.textContent = type;
+            if (initialAbv.value && initialVolume.value && targetAbv.value) {
+                calculateDilution();
+            }
+        }
+        
+        // Calculate dilution function
+        function calculateDilution() {
+            // Get input values
+            const c1 = parseFloat(initialAbv.value);
+            const v1 = parseFloat(initialVolume.value);
+            const c2 = parseFloat(targetAbv.value);
+            
+            // Check if all fields are filled
+            if (!c1 || !v1 || !c2) {
+                return;
+            }
+            
+            // Validate inputs
+            if (c1 <= 0 || v1 <= 0 || c2 <= 0) {
+                return;
+            }
+            
+            if (c2 >= c1) {
+                return;
+            }
+            
+            if (c1 > 100 || c2 > 100) {
+                return;
+            }
+            
+            // Calculate using Pearson's Square formula
+            const v2 = (c1 * v1) / c2;
+            const waterToAdd = v2 - v1;
+            const reductionPercentage = ((c1 - c2) / c1 * 100).toFixed(1);
+            const ratioNumerator = Math.round(v1 / waterToAdd * 10) / 10;
+            const ratio = `${ratioNumerator}:1`;
+            
+            // Update results with animation
+            updateResultWithAnimation(waterResult, waterToAdd.toFixed(1), 'mL');
+            updateResultWithAnimation(volumeResult, v2.toFixed(1), 'mL');
+            reductionResult.innerHTML = `${reductionPercentage}<span class="result-unit">%</span>`;
+            ratioResult.textContent = ratio;
+            
+            // Convert to practical units
+            const cups = (waterToAdd / 236.6).toFixed(1);
+            waterCups.textContent = `${cups} cups`;
+            
+            const bottles = (v2 / 750).toFixed(1);
+            volumeBottles.textContent = `${bottles} bottles`;
+            
+            // Update step-by-step guide
+            stepWater.textContent = `${waterToAdd.toFixed(1)} mL`;
+            
+            // Update chart
+            updateChart(v1, waterToAdd);
+        }
+        
+        // Helper function to animate result updates
+        function updateResultWithAnimation(element, value, unit) {
+            element.classList.remove('fade-in');
+            setTimeout(() => {
+                element.innerHTML = `${value}<span class="result-unit">${unit}</span>`;
+                element.classList.add('fade-in');
+            }, 10);
+        }
+        
+        // Update compact chart
+        function updateChart(v1, waterToAdd) {
+            const ctx = document.getElementById('dilutionChart').getContext('2d');
+            
+            // Destroy existing chart if it exists
+            if (dilutionChart) {
+                dilutionChart.destroy();
+            }
+            
+            dilutionChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Spirit', 'Water'],
+                    datasets: [{
+                        data: [v1, waterToAdd],
+                        backgroundColor: ['#3498db', '#2ecc71'],
+                        borderWidth: 1,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 8,
+                                font: {
+                                    size: 10
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.label}: ${context.parsed.toFixed(1)} mL`;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '55%'
+                }
+            });
+        }
+        
+        // Prevent form submission on Enter key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>
