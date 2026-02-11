@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+     <!-- Apple Touch Icon (the main one for home screen) -->
+<link rel="apple-touch-icon" href="logo.png">
+
+<!-- Optional: Prevents zooming when launching from home screen -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Spirit Dilution & Sweetening Calculator</title>
@@ -664,7 +671,7 @@
                     <div class="input-container">
                         <label for="spirit-volume">Spirit Volume</label>
                         <div class="input-with-unit">
-                            <input type="number" id="spirit-volume" min="10" step="1" placeholder="e.g., 500" inputmode="decimal" value="500">
+                            <input type="number" id="spirit-volume" min="10" step="1" placeholder="e.g., 500" inputmode="decimal">
                             <span class="unit">mL</span>
                         </div>
                         <div class="input-info">Volume of diluted spirit</div>
@@ -673,7 +680,7 @@
                     <div class="input-container">
                         <label for="spirit-abv">Spirit ABV</label>
                         <div class="input-with-unit">
-                            <input type="number" id="spirit-abv" min="10" max="50" step="0.1" placeholder="e.g., 40" inputmode="decimal" value="40">
+                            <input type="number" id="spirit-abv" min="10" max="50" step="0.1" placeholder="e.g., 40" inputmode="decimal">
                             <span class="unit">%</span>
                         </div>
                         <div class="input-info">Alcohol percentage</div>
@@ -682,8 +689,9 @@
                     <div class="input-container">
                         <label for="sweetness-level">Sweetness Level</label>
                         <select id="sweetness-level">
+                            <option value="" disabled selected>Select sweetness...</option>
                             <option value="10">Light (10% sugar)</option>
-                            <option value="20" selected>Medium (20% sugar)</option>
+                            <option value="20">Medium (20% sugar)</option>
                             <option value="30">Sweet (30% sugar)</option>
                             <option value="40">Very Sweet (40% sugar)</option>
                             <option value="50">Liqueur (50% sugar)</option>
@@ -694,8 +702,9 @@
                     <div class="input-container">
                         <label for="syrup-ratio">Syrup Ratio</label>
                         <select id="syrup-ratio">
+                            <option value="" disabled selected>Select ratio...</option>
                             <option value="1:1">1:1 (Light syrup)</option>
-                            <option value="2:1" selected>2:1 (Rich syrup)</option>
+                            <option value="2:1">2:1 (Rich syrup)</option>
                             <option value="3:1">3:1 (Very rich)</option>
                         </select>
                         <div class="input-info">Sugar:Water ratio for syrup</div>
@@ -703,7 +712,7 @@
                 </div>
                 
                 <div class="sugar-type-selector">
-                    <div class="sugar-option selected" data-type="white">
+                    <div class="sugar-option" data-type="white">
                         <div class="sugar-name">White Sugar</div>
                     </div>
                     <div class="sugar-option" data-type="brown">
@@ -753,7 +762,7 @@
                 
                 <div class="syrup-results">
                     <div class="syrup-ratio-title">Sugar Syrup Preparation</div>
-                    <div class="syrup-ratio" id="syrup-ratio-display">2:1 Sugar:Water</div>
+                    <div class="syrup-ratio" id="syrup-ratio-display">Select syrup ratio</div>
                     
                     <div class="syrup-result-item">
                         <div class="syrup-result-label">Total Syrup Needed</div>
@@ -932,8 +941,8 @@
         let dilutionChart = null;
         let sweeteningChart = null;
         
-        // Current sugar type
-        let currentSugarType = 'white';
+        // Current sugar type (none selected initially)
+        let currentSugarType = null;
         
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
@@ -1030,21 +1039,35 @@
             });
             
             sweetResetBtn.addEventListener('click', function() {
-                spiritVolume.value = '500';
-                spiritAbv.value = '40';
-                sweetnessLevel.value = '20';
-                syrupRatioSelect.value = '2:1';
+                spiritVolume.value = '';
+                spiritAbv.value = '';
+                sweetnessLevel.value = '';
+                syrupRatioSelect.value = '';
                 
                 // Reset sugar selection
                 sugarOptions.forEach(opt => opt.classList.remove('selected'));
-                document.querySelector('.sugar-option[data-type="white"]').classList.add('selected');
-                currentSugarType = 'white';
+                currentSugarType = null;
                 
-                calculateSweetening();
+                // Reset sweetening results
+                sugarResult.innerHTML = '0<span class="sweet-result-unit">g</span>';
+                syrupWater.innerHTML = '0<span class="sweet-result-unit">mL</span>';
+                syrupVolume.innerHTML = '0<span class="sweet-result-unit">mL</span>';
+                finalSweetVolume.innerHTML = '0<span class="sweet-result-unit">mL</span>';
+                finalAbv.textContent = '0%';
+                sugarCups.textContent = '0 cups';
+                syrupCups.textContent = '0 cups';
+                sweetBottles.textContent = '0 bottles';
+                syrupRatioDisplay.textContent = 'Select syrup ratio';
+                totalSyrup.textContent = '0 mL';
+                syrupSugar.textContent = '0 g';
+                syrupWaterResult.textContent = '0 mL';
+                
+                // Reset chart
+                if (sweeteningChart) {
+                    sweeteningChart.destroy();
+                    sweeteningChart = null;
+                }
             });
-            
-            // Initial calculations
-            calculateSweetening();
         });
         
         // Calculate dilution function
@@ -1107,7 +1130,32 @@
             const sweetness = parseFloat(sweetnessLevel.value);
             const syrupRatio = syrupRatioSelect.value;
             
-            if (!volume || !abv || !sweetness) {
+            // Check if all required fields are filled
+            if (!volume || !abv || !sweetness || !syrupRatio || !currentSugarType) {
+                // Reset results if any field is missing
+                sugarResult.innerHTML = '0<span class="sweet-result-unit">g</span>';
+                syrupWater.innerHTML = '0<span class="sweet-result-unit">mL</span>';
+                syrupVolume.innerHTML = '0<span class="sweet-result-unit">mL</span>';
+                finalSweetVolume.innerHTML = '0<span class="sweet-result-unit">mL</span>';
+                finalAbv.textContent = '0%';
+                sugarCups.textContent = '0 cups';
+                syrupCups.textContent = '0 cups';
+                sweetBottles.textContent = '0 bottles';
+                syrupRatioDisplay.textContent = 'Select syrup ratio';
+                totalSyrup.textContent = '0 mL';
+                syrupSugar.textContent = '0 g';
+                syrupWaterResult.textContent = '0 mL';
+                
+                // Clear chart if it exists
+                if (sweeteningChart) {
+                    sweeteningChart.destroy();
+                    sweeteningChart = null;
+                }
+                return;
+            }
+            
+            // Validate inputs
+            if (volume <= 0 || abv <= 0 || sweetness <= 0) {
                 return;
             }
             
@@ -1117,10 +1165,6 @@
             
             // Update syrup ratio display
             syrupRatioDisplay.textContent = `${sugarParts}:${waterParts} Sugar:Water`;
-            
-            // Calculate total sugar needed (as percentage of final volume)
-            // Final volume = spiritVolume + syrupVolume
-            // Sugar percentage = (sugarWeight / finalVolume) * 100 = targetSweetness
             
             // Sugar density varies by type (g/mL)
             let sugarDensity;
