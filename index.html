@@ -1,26 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
-<head> 
-    <!-- Apple Touch Icon (the main one for home screen) -->
+<head>
+     <!-- Apple Touch Icon (the main one for home screen) -->
 <link rel="apple-touch-icon" href="logo.png">
 
 <!-- Optional: Prevents zooming when launching from home screen -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Spirit Dilution Calculator</title>
+    <title>Spirit Dilution & Sweetening Calculator</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --primary: #2c3e50;
             --secondary: #3498db;
             --success: #27ae60;
             --accent: #e74c3c;
+            --warning: #f39c12;
             --light: #ecf0f1;
             --gradient: linear-gradient(135deg, #2c3e50 0%, #4a6491 100%);
+            --sweet-gradient: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
         }
         
         * {
@@ -64,7 +66,7 @@
         }
         
         header h1 {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             margin-bottom: 5px;
             display: flex;
             align-items: center;
@@ -72,8 +74,19 @@
             gap: 8px;
         }
         
+        .header-subtitle {
+            font-size: 0.8rem;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+        
         .calculator-card {
             border-left: 4px solid var(--secondary);
+        }
+        
+        .sweetening-card {
+            border-left: 4px solid #8B4513;
+            background: #fef9f3;
         }
         
         .section-title {
@@ -137,7 +150,6 @@
             appearance: none;
         }
         
-        /* Remove arrow keys from number input */
         input[type=number]::-webkit-inner-spin-button, 
         input[type=number]::-webkit-outer-spin-button { 
             -webkit-appearance: none; 
@@ -171,6 +183,10 @@
             border-left: 4px solid var(--success);
         }
         
+        .sweet-results-card {
+            border-left: 4px solid #D2691E;
+        }
+        
         .results-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -179,6 +195,13 @@
         
         .result-box {
             background: var(--light);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+        
+        .sweet-result-box {
+            background: #f5e6d3;
             border-radius: 8px;
             padding: 12px;
             text-align: center;
@@ -197,9 +220,21 @@
             color: var(--primary);
         }
         
+        .sweet-result-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #8B4513;
+        }
+        
         .result-unit {
             font-size: 0.85rem;
             color: var(--secondary);
+            margin-left: 3px;
+        }
+        
+        .sweet-result-unit {
+            font-size: 0.85rem;
+            color: #D2691E;
             margin-left: 3px;
         }
         
@@ -207,14 +242,6 @@
             font-size: 0.75rem;
             color: #666;
             margin-top: 4px;
-        }
-        
-        .water-type-info {
-            font-size: 0.8rem;
-            color: #666;
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px solid #eee;
         }
         
         .compact-chart {
@@ -240,11 +267,32 @@
             gap: 8px;
         }
         
+        .sweet-reset-btn {
+            width: 100%;
+            padding: 12px;
+            background: #f5e6d3;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 10px;
+            color: #8B4513;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
         .reset-btn:hover {
             background: #e0e0e0;
         }
         
-        /* Dropdown sections */
+        .sweet-reset-btn:hover {
+            background: #e8d4bc;
+        }
+        
         .dropdown-content {
             max-height: 0;
             overflow: hidden;
@@ -262,6 +310,11 @@
         .notes-card {
             border-left: 4px solid #ffb300;
             background: #fff8e1;
+        }
+        
+        .syrup-guide-card {
+            border-left: 4px solid #27ae60;
+            background: #f0f9f0;
         }
         
         .steps-list {
@@ -311,6 +364,73 @@
         .note-item i {
             color: #e65100;
             margin-top: 2px;
+        }
+        
+        .warning-box {
+            background: #ffebee;
+            border-left: 4px solid #e74c3c;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 0.85rem;
+        }
+        
+        .warning-title {
+            color: #c0392b;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .syrup-ratio-box {
+            background: #e8f5e9;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            text-align: center;
+        }
+        
+        .syrup-ratio-title {
+            font-weight: 600;
+            color: #27ae60;
+            margin-bottom: 8px;
+        }
+        
+        .syrup-ratio {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin: 10px 0;
+        }
+        
+        .sugar-type-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .sugar-option {
+            padding: 10px;
+            background: #f9f9f9;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .sugar-option.selected {
+            background: #f5e6d3;
+            border-color: #D2691E;
+            color: #8B4513;
+        }
+        
+        .sugar-name {
+            font-weight: 600;
+            font-size: 0.9rem;
         }
         
         @keyframes fadeIn {
@@ -364,96 +484,334 @@
             border-radius: 4px;
             font-weight: 600;
         }
+        
+        .sweet-highlight {
+            background: linear-gradient(120deg, #f5d0a9 0%, #f7e5ce 100%);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+            color: #8B4513;
+        }
+        
+        .calculator-switch {
+            display: flex;
+            background: var(--light);
+            border-radius: 8px;
+            padding: 3px;
+            margin-bottom: 15px;
+        }
+        
+        .calc-tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+        
+        .calc-tab.active {
+            background: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .calculator-section {
+            display: none;
+        }
+        
+        .calculator-section.active {
+            display: block;
+        }
+        
+        .syrup-results {
+            background: #f9f9f9;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        
+        .syrup-result-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed #ddd;
+        }
+        
+        .syrup-result-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .syrup-result-label {
+            font-weight: 600;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .syrup-result-value {
+            font-weight: 700;
+            color: #8B4513;
+            font-size: 1rem;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1><i class="fas fa-wine-bottle"></i> Spirit Dilution Calculator 🐑</h1>
+            <h1><i class="fas fa-cocktail"></i> Spirit Calculators 🐑</h1>
+            <div class="header-subtitle">Dilution & Sweetening Calculator</div>
         </header>
         
-        <div class="card calculator-card">
-            <h2 class="section-title"><i class="fas fa-calculator"></i> Calculator</h2>
-            
-            <div class="input-grid">
-                <div class="input-container">
-                    <label for="initial-abv">Initial ABV</label>
-                    <div class="input-with-unit">
-                        <input type="number" id="initial-abv" min="20" max="95" step="0.1" placeholder="e.g., 75" inputmode="decimal">
-                        <span class="unit">%</span>
-                    </div>
-                    <div class="input-info">Distillate strength</div>
-                </div>
-                
-                <div class="input-container">
-                    <label for="initial-volume">Initial Volume</label>
-                    <div class="input-with-unit">
-                        <input type="number" id="initial-volume" min="10" step="1" placeholder="e.g., 200" inputmode="decimal">
-                        <span class="unit">mL</span>
-                    </div>
-                    <div class="input-info">Volume of distillate</div>
-                </div>
-                
-                <div class="input-container">
-                    <label for="target-abv">Target ABV</label>
-                    <div class="input-with-unit">
-                        <input type="number" id="target-abv" min="10" max="60" step="0.1" placeholder="e.g., 40" inputmode="decimal">
-                        <span class="unit">%</span>
-                    </div>
-                    <div class="input-info">Desired strength</div>
-                </div>
-                
-                <div class="input-container">
-                    <label for="water-type">Water Type</label>
-                    <select id="water-type">
-                        <option value="distilled">Distilled Water</option>
-                        <option value="filtered">Filtered Water</option>
-                        <option value="spring">Spring Water</option>
-                    </select>
-                    <div class="input-info">For clarity</div>
-                </div>
-            </div>
-            
-            <button class="reset-btn" id="reset-btn">
-                <i class="fas fa-redo"></i> Reset to Default
-            </button>
+        <div class="calculator-switch">
+            <div class="calc-tab active" id="dilution-tab">Dilution</div>
+            <div class="calc-tab" id="sweetening-tab">Sweetening</div>
         </div>
         
-        <div class="card results-card">
-            <h2 class="section-title"><i class="fas fa-chart-bar"></i> Results</h2>
-            
-            <div class="results-grid">
-                <div class="result-box">
-                    <div class="result-label">Water to Add</div>
-                    <div class="result-value" id="water-result">0<span class="result-unit">mL</span></div>
-                    <div class="result-detail" id="water-cups">0 cups</div>
+        <!-- Dilution Calculator -->
+        <div class="calculator-section active" id="dilution-calculator">
+            <div class="card calculator-card">
+                <h2 class="section-title"><i class="fas fa-tint"></i> Dilution Calculator</h2>
+                
+                <div class="input-grid">
+                    <div class="input-container">
+                        <label for="initial-abv">Initial ABV</label>
+                        <div class="input-with-unit">
+                            <input type="number" id="initial-abv" min="20" max="95" step="0.1" placeholder="e.g., 75" inputmode="decimal">
+                            <span class="unit">%</span>
+                        </div>
+                        <div class="input-info">Distillate strength</div>
+                    </div>
+                    
+                    <div class="input-container">
+                        <label for="initial-volume">Initial Volume</label>
+                        <div class="input-with-unit">
+                            <input type="number" id="initial-volume" min="10" step="1" placeholder="e.g., 200" inputmode="decimal">
+                            <span class="unit">mL</span>
+                        </div>
+                        <div class="input-info">Volume of distillate</div>
+                    </div>
+                    
+                    <div class="input-container">
+                        <label for="target-abv">Target ABV</label>
+                        <div class="input-with-unit">
+                            <input type="number" id="target-abv" min="10" max="60" step="0.1" placeholder="e.g., 40" inputmode="decimal">
+                            <span class="unit">%</span>
+                        </div>
+                        <div class="input-info">Desired strength</div>
+                    </div>
+                    
+                    <div class="input-container">
+                        <label for="water-type">Water Type</label>
+                        <select id="water-type">
+                            <option value="distilled">Distilled Water</option>
+                            <option value="filtered">Filtered Water</option>
+                            <option value="spring">Spring Water</option>
+                        </select>
+                        <div class="input-info">For clarity</div>
+                    </div>
                 </div>
                 
-                <div class="result-box">
-                    <div class="result-label">Final Volume</div>
-                    <div class="result-value" id="volume-result">0<span class="result-unit">mL</span></div>
-                    <div class="result-detail" id="volume-bottles">0 bottles</div>
-                </div>
-                
-                <div class="result-box">
-                    <div class="result-label">ABV Reduction</div>
-                    <div class="result-value" id="reduction-result">0<span class="result-unit">%</span></div>
-                    <div class="result-detail" id="reduction-detail">Strength decrease</div>
-                </div>
-                
-                <div class="result-box">
-                    <div class="result-label">Dilution Ratio</div>
-                    <div class="result-value" id="ratio-result">0:0</div>
-                    <div class="result-detail" id="ratio-detail">Spirit:Water</div>
-                </div>
+                <button class="reset-btn" id="reset-btn">
+                    <i class="fas fa-redo"></i> Reset Dilution
+                </button>
             </div>
             
-            <div class="water-type-info">
-                <i class="fas fa-info-circle"></i> Using <span id="water-type-display">distilled</span> water
+            <div class="card results-card">
+                <h2 class="section-title"><i class="fas fa-chart-bar"></i> Dilution Results</h2>
+                
+                <div class="results-grid">
+                    <div class="result-box">
+                        <div class="result-label">Water to Add</div>
+                        <div class="result-value" id="water-result">0<span class="result-unit">mL</span></div>
+                        <div class="result-detail" id="water-cups">0 cups</div>
+                    </div>
+                    
+                    <div class="result-box">
+                        <div class="result-label">Final Volume</div>
+                        <div class="result-value" id="volume-result">0<span class="result-unit">mL</span></div>
+                        <div class="result-detail" id="volume-bottles">0 bottles</div>
+                    </div>
+                    
+                    <div class="result-box">
+                        <div class="result-label">ABV Reduction</div>
+                        <div class="result-value" id="reduction-result">0<span class="result-unit">%</span></div>
+                        <div class="result-detail" id="reduction-detail">Strength decrease</div>
+                    </div>
+                    
+                    <div class="result-box">
+                        <div class="result-label">Dilution Ratio</div>
+                        <div class="result-value" id="ratio-result">0:0</div>
+                        <div class="result-detail" id="ratio-detail">Spirit:Water</div>
+                    </div>
+                </div>
+                
+                <div class="compact-chart">
+                    <canvas id="dilutionChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sweetening Calculator -->
+        <div class="calculator-section" id="sweetening-calculator">
+            <div class="warning-box">
+                <div class="warning-title">
+                    <i class="fas fa-exclamation-triangle"></i> Important Warning
+                </div>
+                <div>Never add dry sugar directly to alcohol! You must first make sugar syrup. Dry sugar won't dissolve properly in high-proof alcohol and can create crystallization and separation issues.</div>
             </div>
             
-            <div class="compact-chart">
-                <canvas id="dilutionChart"></canvas>
+            <div class="card sweetening-card">
+                <h2 class="section-title"><i class="fas fa-candy-cane"></i> Sweetening Calculator</h2>
+                
+                <div class="input-grid">
+                    <div class="input-container">
+                        <label for="spirit-volume">Spirit Volume</label>
+                        <div class="input-with-unit">
+                            <input type="number" id="spirit-volume" min="10" step="1" placeholder="e.g., 500" inputmode="decimal" value="500">
+                            <span class="unit">mL</span>
+                        </div>
+                        <div class="input-info">Volume of diluted spirit</div>
+                    </div>
+                    
+                    <div class="input-container">
+                        <label for="spirit-abv">Spirit ABV</label>
+                        <div class="input-with-unit">
+                            <input type="number" id="spirit-abv" min="10" max="50" step="0.1" placeholder="e.g., 40" inputmode="decimal" value="40">
+                            <span class="unit">%</span>
+                        </div>
+                        <div class="input-info">Alcohol percentage</div>
+                    </div>
+                    
+                    <div class="input-container">
+                        <label for="sweetness-level">Sweetness Level</label>
+                        <select id="sweetness-level">
+                            <option value="10">Light (10% sugar)</option>
+                            <option value="20" selected>Medium (20% sugar)</option>
+                            <option value="30">Sweet (30% sugar)</option>
+                            <option value="40">Very Sweet (40% sugar)</option>
+                            <option value="50">Liqueur (50% sugar)</option>
+                        </select>
+                        <div class="input-info">Sugar percentage of final volume</div>
+                    </div>
+                    
+                    <div class="input-container">
+                        <label for="syrup-ratio">Syrup Ratio</label>
+                        <select id="syrup-ratio">
+                            <option value="1:1">1:1 (Light syrup)</option>
+                            <option value="2:1" selected>2:1 (Rich syrup)</option>
+                            <option value="3:1">3:1 (Very rich)</option>
+                        </select>
+                        <div class="input-info">Sugar:Water ratio for syrup</div>
+                    </div>
+                </div>
+                
+                <div class="sugar-type-selector">
+                    <div class="sugar-option selected" data-type="white">
+                        <div class="sugar-name">White Sugar</div>
+                    </div>
+                    <div class="sugar-option" data-type="brown">
+                        <div class="sugar-name">Brown Sugar</div>
+                    </div>
+                    <div class="sugar-option" data-type="honey">
+                        <div class="sugar-name">Honey</div>
+                    </div>
+                    <div class="sugar-option" data-type="agave">
+                        <div class="sugar-name">Agave Syrup</div>
+                    </div>
+                </div>
+                
+                <button class="sweet-reset-btn" id="sweet-reset-btn">
+                    <i class="fas fa-redo"></i> Reset Sweetening
+                </button>
+            </div>
+            
+            <div class="card sweet-results-card">
+                <h2 class="section-title"><i class="fas fa-weight"></i> Sweetening Results</h2>
+                
+                <div class="results-grid">
+                    <div class="sweet-result-box">
+                        <div class="result-label">Sugar Needed</div>
+                        <div class="sweet-result-value" id="sugar-result">0<span class="sweet-result-unit">g</span></div>
+                        <div class="result-detail" id="sugar-cups">0 cups</div>
+                    </div>
+                    
+                    <div class="sweet-result-box">
+                        <div class="result-label">Water for Syrup</div>
+                        <div class="sweet-result-value" id="syrup-water">0<span class="sweet-result-unit">mL</span></div>
+                        <div class="result-detail" id="syrup-cups">0 cups</div>
+                    </div>
+                    
+                    <div class="sweet-result-box">
+                        <div class="result-label">Syrup Volume</div>
+                        <div class="sweet-result-value" id="syrup-volume">0<span class="sweet-result-unit">mL</span></div>
+                        <div class="result-detail" id="syrup-detail">Total syrup</div>
+                    </div>
+                    
+                    <div class="sweet-result-box">
+                        <div class="result-label">Final Volume</div>
+                        <div class="sweet-result-value" id="final-sweet-volume">0<span class="sweet-result-unit">mL</span></div>
+                        <div class="result-detail" id="sweet-bottles">0 bottles</div>
+                    </div>
+                </div>
+                
+                <div class="syrup-results">
+                    <div class="syrup-ratio-title">Sugar Syrup Preparation</div>
+                    <div class="syrup-ratio" id="syrup-ratio-display">2:1 Sugar:Water</div>
+                    
+                    <div class="syrup-result-item">
+                        <div class="syrup-result-label">Total Syrup Needed</div>
+                        <div class="syrup-result-value" id="total-syrup">0 mL</div>
+                    </div>
+                    <div class="syrup-result-item">
+                        <div class="syrup-result-label">Sugar for Syrup</div>
+                        <div class="syrup-result-value" id="syrup-sugar">0 g</div>
+                    </div>
+                    <div class="syrup-result-item">
+                        <div class="syrup-result-label">Water for Syrup</div>
+                        <div class="syrup-result-value" id="syrup-water-result">0 mL</div>
+                    </div>
+                    <div class="syrup-result-item">
+                        <div class="syrup-result-label">Final ABV</div>
+                        <div class="syrup-result-value" id="final-abv">0%</div>
+                    </div>
+                </div>
+                
+                <div class="compact-chart">
+                    <canvas id="sweeteningChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card syrup-guide-card">
+            <h2 class="section-title" id="syrup-toggle">
+                <div>
+                    <i class="fas fa-flask"></i> How to Make Sugar Syrup
+                </div>
+                <i class="fas fa-chevron-down chevron" id="syrup-chevron"></i>
+            </h2>
+            
+            <div class="dropdown-content" id="syrup-content">
+                <ol class="steps-list">
+                    <li><strong>Measure sugar and water</strong> according to the ratio selected (typically 2:1 sugar:water)</li>
+                    <li><strong>Heat water</strong> in a clean saucepan until warm but not boiling (60-70°C / 140-160°F)</li>
+                    <li><strong>Add sugar slowly</strong> while stirring continuously until fully dissolved</li>
+                    <li><strong>Do NOT boil</strong> as this can create crystallization issues later</li>
+                    <li><strong>Cool completely</strong> to room temperature before adding to spirit</li>
+                    <li><strong>Add syrup gradually</strong> to your spirit, tasting as you go</li>
+                    <li><strong>Let it rest</strong> for 1-2 weeks to allow flavors to integrate</li>
+                    <li><strong>Filter if needed</strong> through coffee filter for clarity</li>
+                </ol>
+                
+                <div class="syrup-ratio-box">
+                    <div class="syrup-ratio-title">Common Syrup Ratios</div>
+                    <div><strong>1:1 (Simple Syrup):</strong> Equal parts sugar and water. Thin consistency, 50% sugar.</div>
+                    <div><strong>2:1 (Rich Syrup):</strong> Twice as much sugar as water. Thicker, 67% sugar. RECOMMENDED for spirits.</div>
+                    <div><strong>3:1 (Very Rich):</strong> Three parts sugar to one water. Very thick, 75% sugar.</div>
+                </div>
             </div>
         </div>
         
@@ -469,12 +827,12 @@
                 <ol class="steps-list">
                     <li><strong>Measure your distillate</strong> precisely using a graduated cylinder</li>
                     <li><strong>Chill both distillate and water</strong> to prevent louche effect (cloudiness)</li>
-                    <li><strong>Add <span class="highlight" id="step-water">0 mL</span> of <span id="step-water-type">distilled</span> water</strong> slowly in stages</li>
-                    <li><strong>Stir gently but thoroughly</strong> after each water addition</li>
-                    <li><strong>Let the mixture rest</strong> for 24-48 hours in a sealed container</li>
+                    <li><strong>Add <span class="highlight" id="step-water">0 mL</span> of water</strong> slowly in stages</li>
+                    <li><strong>Prepare sugar syrup</strong> using the calculated amounts</li>
+                    <li><strong>Add cooled syrup gradually</strong> to the diluted spirit</li>
+                    <li><strong>Stir gently but thoroughly</strong> after each addition</li>
+                    <li><strong>Let the mixture rest</strong> for 1-2 weeks in a sealed container</li>
                     <li><strong>Check final ABV</strong> with an alcoholmeter for verification</li>
-                    <li><strong>Filter if cloudy</strong> through coffee filter or activated carbon</li>
-                    <li><strong>Age if desired</strong> to allow flavors to marry</li>
                 </ol>
             </div>
         </div>
@@ -490,20 +848,20 @@
             <div class="dropdown-content" id="notes-content">
                 <div class="notes-content">
                     <div class="note-item">
-                        <i class="fas fa-cloud"></i>
-                        <div><strong>Louche Effect:</strong> High-proof distillates may turn cloudy when diluted. Use distilled water and dilute in stages to minimize this.</div>
+                        <i class="fas fa-exclamation-circle"></i>
+                        <div><strong>Never add dry sugar:</strong> Sugar won't dissolve in high-proof alcohol. Always make syrup first.</div>
+                    </div>
+                    <div class="note-item">
+                        <i class="fas fa-thermometer"></i>
+                        <div><strong>Syrup temperature:</strong> Always cool syrup to room temp before adding to alcohol to prevent evaporation.</div>
                     </div>
                     <div class="note-item">
                         <i class="fas fa-clock"></i>
-                        <div><strong>Resting Period:</strong> Always let diluted spirit rest for 24-48 hours before final filtration or bottling.</div>
+                        <div><strong>Aging period:</strong> Sweetened spirits need 1-2 weeks to integrate flavors properly.</div>
                     </div>
                     <div class="note-item">
-                        <i class="fas fa-thermometer-half"></i>
-                        <div><strong>Temperature:</strong> Measure ABV at 20°C (68°F) for accurate readings.</div>
-                    </div>
-                    <div class="note-item">
-                        <i class="fas fa-balance-scale"></i>
-                        <div><strong>Legal Compliance:</strong> Ensure you comply with local regulations regarding alcohol production and distillation.</div>
+                        <i class="fas fa-vial"></i>
+                        <div><strong>Test small batches:</strong> Always make a small test batch before scaling up your recipe.</div>
                     </div>
                 </div>
             </div>
@@ -525,6 +883,14 @@
         const waterType = document.getElementById('water-type');
         const resetBtn = document.getElementById('reset-btn');
         
+        // Sweetening calculator elements
+        const spiritVolume = document.getElementById('spirit-volume');
+        const spiritAbv = document.getElementById('spirit-abv');
+        const sweetnessLevel = document.getElementById('sweetness-level');
+        const syrupRatioSelect = document.getElementById('syrup-ratio');
+        const sugarOptions = document.querySelectorAll('.sugar-option');
+        const sweetResetBtn = document.getElementById('sweet-reset-btn');
+        
         // Results elements
         const waterResult = document.getElementById('water-result');
         const volumeResult = document.getElementById('volume-result');
@@ -532,11 +898,23 @@
         const ratioResult = document.getElementById('ratio-result');
         const waterCups = document.getElementById('water-cups');
         const volumeBottles = document.getElementById('volume-bottles');
-        const waterTypeDisplay = document.getElementById('water-type-display');
+        
+        // Sweetening results elements
+        const sugarResult = document.getElementById('sugar-result');
+        const syrupWater = document.getElementById('syrup-water');
+        const syrupVolume = document.getElementById('syrup-volume');
+        const finalSweetVolume = document.getElementById('final-sweet-volume');
+        const finalAbv = document.getElementById('final-abv');
+        const sugarCups = document.getElementById('sugar-cups');
+        const syrupCups = document.getElementById('syrup-cups');
+        const sweetBottles = document.getElementById('sweet-bottles');
+        const syrupRatioDisplay = document.getElementById('syrup-ratio-display');
+        const totalSyrup = document.getElementById('total-syrup');
+        const syrupSugar = document.getElementById('syrup-sugar');
+        const syrupWaterResult = document.getElementById('syrup-water-result');
         
         // Step-by-step elements
         const stepWater = document.getElementById('step-water');
-        const stepWaterType = document.getElementById('step-water-type');
         
         // Dropdown toggles
         const guideToggle = document.getElementById('guide-toggle');
@@ -547,16 +925,65 @@
         const notesContent = document.getElementById('notes-content');
         const notesChevron = document.getElementById('notes-chevron');
         
-        // Chart
+        const syrupToggle = document.getElementById('syrup-toggle');
+        const syrupContent = document.getElementById('syrup-content');
+        const syrupChevron = document.getElementById('syrup-chevron');
+        
+        // Calculator tabs
+        const dilutionTab = document.getElementById('dilution-tab');
+        const sweeteningTab = document.getElementById('sweetening-tab');
+        const dilutionCalc = document.getElementById('dilution-calculator');
+        const sweeteningCalc = document.getElementById('sweetening-calculator');
+        
+        // Charts
         let dilutionChart = null;
+        let sweeteningChart = null;
+        
+        // Current sugar type
+        let currentSugarType = 'white';
         
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            // Auto-calculate when inputs change
+            // Setup calculator tabs
+            dilutionTab.addEventListener('click', function() {
+                dilutionTab.classList.add('active');
+                sweeteningTab.classList.remove('active');
+                dilutionCalc.classList.add('active');
+                sweeteningCalc.classList.remove('active');
+            });
+            
+            sweeteningTab.addEventListener('click', function() {
+                sweeteningTab.classList.add('active');
+                dilutionTab.classList.remove('active');
+                sweeteningCalc.classList.add('active');
+                dilutionCalc.classList.remove('active');
+            });
+            
+            // Auto-calculate when inputs change (dilution)
             initialAbv.addEventListener('input', calculateDilution);
             initialVolume.addEventListener('input', calculateDilution);
             targetAbv.addEventListener('input', calculateDilution);
-            waterType.addEventListener('change', updateWaterType);
+            waterType.addEventListener('change', function() {
+                if (initialAbv.value && initialVolume.value && targetAbv.value) {
+                    calculateDilution();
+                }
+            });
+            
+            // Auto-calculate when inputs change (sweetening)
+            spiritVolume.addEventListener('input', calculateSweetening);
+            spiritAbv.addEventListener('input', calculateSweetening);
+            sweetnessLevel.addEventListener('change', calculateSweetening);
+            syrupRatioSelect.addEventListener('change', calculateSweetening);
+            
+            // Sugar type selection
+            sugarOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    sugarOptions.forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    currentSugarType = this.getAttribute('data-type');
+                    calculateSweetening();
+                });
+            });
             
             // Setup dropdown toggles
             guideToggle.addEventListener('click', function() {
@@ -577,13 +1004,21 @@
                 }
             });
             
-            // Reset button
+            syrupToggle.addEventListener('click', function() {
+                syrupContent.classList.toggle('expanded');
+                if (syrupContent.classList.contains('expanded')) {
+                    syrupChevron.className = 'fas fa-chevron-up chevron';
+                } else {
+                    syrupChevron.className = 'fas fa-chevron-down chevron';
+                }
+            });
+            
+            // Reset buttons
             resetBtn.addEventListener('click', function() {
                 initialAbv.value = '';
                 initialVolume.value = '';
                 targetAbv.value = '';
                 waterType.value = 'distilled';
-                updateWaterType();
                 
                 // Reset results
                 waterResult.innerHTML = '0<span class="result-unit">mL</span>';
@@ -601,18 +1036,23 @@
                 }
             });
             
-            updateWaterType();
+            sweetResetBtn.addEventListener('click', function() {
+                spiritVolume.value = '500';
+                spiritAbv.value = '40';
+                sweetnessLevel.value = '20';
+                syrupRatioSelect.value = '2:1';
+                
+                // Reset sugar selection
+                sugarOptions.forEach(opt => opt.classList.remove('selected'));
+                document.querySelector('.sugar-option[data-type="white"]').classList.add('selected');
+                currentSugarType = 'white';
+                
+                calculateSweetening();
+            });
+            
+            // Initial calculations
+            calculateSweetening();
         });
-        
-        // Update water type display
-        function updateWaterType() {
-            const type = waterType.options[waterType.selectedIndex].text.split(' ')[0].toLowerCase();
-            waterTypeDisplay.textContent = type;
-            stepWaterType.textContent = type;
-            if (initialAbv.value && initialVolume.value && targetAbv.value) {
-                calculateDilution();
-            }
-        }
         
         // Calculate dilution function
         function calculateDilution() {
@@ -663,7 +1103,88 @@
             stepWater.textContent = `${waterToAdd.toFixed(1)} mL`;
             
             // Update chart
-            updateChart(v1, waterToAdd);
+            updateDilutionChart(v1, waterToAdd);
+        }
+        
+        // Calculate sweetening function
+        function calculateSweetening() {
+            // Get input values
+            const volume = parseFloat(spiritVolume.value);
+            const abv = parseFloat(spiritAbv.value);
+            const sweetness = parseFloat(sweetnessLevel.value);
+            const syrupRatio = syrupRatioSelect.value;
+            
+            if (!volume || !abv || !sweetness) {
+                return;
+            }
+            
+            // Parse syrup ratio (e.g., "2:1" -> sugarParts=2, waterParts=1)
+            const [sugarParts, waterParts] = syrupRatio.split(':').map(Number);
+            const totalParts = sugarParts + waterParts;
+            
+            // Update syrup ratio display
+            syrupRatioDisplay.textContent = `${sugarParts}:${waterParts} Sugar:Water`;
+            
+            // Calculate total sugar needed (as percentage of final volume)
+            // Final volume = spiritVolume + syrupVolume
+            // Sugar percentage = (sugarWeight / finalVolume) * 100 = targetSweetness
+            
+            // Sugar density varies by type (g/mL)
+            let sugarDensity;
+            switch(currentSugarType) {
+                case 'white': sugarDensity = 0.85; break; // White sugar
+                case 'brown': sugarDensity = 0.80; break; // Brown sugar (less dense)
+                case 'honey': sugarDensity = 1.42; break; // Honey
+                case 'agave': sugarDensity = 1.38; break; // Agave syrup
+                default: sugarDensity = 0.85;
+            }
+            
+            // Solve for sugar weight: sweetness% = sugarWeight / (volume + sugarWeight/sugarDensity) * 100
+            // Rearranged: sugarWeight = (sweetness/100) * volume / (1 - sweetness/(100*sugarDensity))
+            const sugarWeight = (sweetness/100) * volume / (1 - sweetness/(100*sugarDensity));
+            
+            // Calculate syrup components based on ratio
+            const syrupSugarWeight = sugarWeight;
+            const syrupWaterWeight = (syrupSugarWeight / sugarParts) * waterParts;
+            
+            // Convert weights to volumes (water density = 1 g/mL)
+            const syrupSugarVolume = syrupSugarWeight / sugarDensity;
+            const syrupWaterVolume = syrupWaterWeight; // 1 g/mL for water
+            
+            const totalSyrupVolume = syrupSugarVolume + syrupWaterVolume;
+            const finalTotalVolume = volume + totalSyrupVolume;
+            
+            // Calculate final ABV (diluted by syrup)
+            const finalABV = (abv * volume) / finalTotalVolume;
+            
+            // Convert to practical units
+            let sugarCupValue;
+            switch(currentSugarType) {
+                case 'white': sugarCupValue = (syrupSugarWeight / 200).toFixed(1); break; // 1 cup white sugar = 200g
+                case 'brown': sugarCupValue = (syrupSugarWeight / 220).toFixed(1); break; // 1 cup brown sugar = 220g
+                case 'honey': sugarCupValue = (syrupSugarWeight / 340).toFixed(1); break; // 1 cup honey = 340g
+                case 'agave': sugarCupValue = (syrupSugarWeight / 320).toFixed(1); break; // 1 cup agave = 320g
+                default: sugarCupValue = (syrupSugarWeight / 200).toFixed(1);
+            }
+            
+            // Update results
+            sugarResult.innerHTML = `${syrupSugarWeight.toFixed(1)}<span class="sweet-result-unit">g</span>`;
+            syrupWater.innerHTML = `${syrupWaterVolume.toFixed(1)}<span class="sweet-result-unit">mL</span>`;
+            syrupVolume.innerHTML = `${totalSyrupVolume.toFixed(1)}<span class="sweet-result-unit">mL</span>`;
+            finalSweetVolume.innerHTML = `${finalTotalVolume.toFixed(1)}<span class="sweet-result-unit">mL</span>`;
+            finalAbv.textContent = `${finalABV.toFixed(1)}%`;
+            
+            sugarCups.textContent = `${sugarCupValue} cups`;
+            syrupCups.textContent = `${(syrupWaterVolume / 236.6).toFixed(1)} cups`;
+            sweetBottles.textContent = `${(finalTotalVolume / 750).toFixed(1)} bottles`;
+            
+            // Update syrup details
+            totalSyrup.textContent = `${totalSyrupVolume.toFixed(1)} mL`;
+            syrupSugar.textContent = `${syrupSugarWeight.toFixed(1)} g`;
+            syrupWaterResult.textContent = `${syrupWaterVolume.toFixed(1)} mL`;
+            
+            // Update chart
+            updateSweeteningChart(volume, totalSyrupVolume, finalTotalVolume);
         }
         
         // Helper function to animate result updates
@@ -675,11 +1196,11 @@
             }, 10);
         }
         
-        // Update compact chart
-        function updateChart(v1, waterToAdd) {
-            const ctx = document.getElementById('dilutionChart').getContext('2d');
+        // Update dilution chart
+        function updateDilutionChart(v1, waterToAdd) {
+            const ctx = document.getElementById('dilutionChart')?.getContext('2d');
+            if (!ctx) return;
             
-            // Destroy existing chart if it exists
             if (dilutionChart) {
                 dilutionChart.destroy();
             }
@@ -691,6 +1212,52 @@
                     datasets: [{
                         data: [v1, waterToAdd],
                         backgroundColor: ['#3498db', '#2ecc71'],
+                        borderWidth: 1,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 8,
+                                font: {
+                                    size: 10
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.label}: ${context.parsed.toFixed(1)} mL`;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '55%'
+                }
+            });
+        }
+        
+        // Update sweetening chart
+        function updateSweeteningChart(spiritVol, syrupVol, finalVol) {
+            const ctx = document.getElementById('sweeteningChart')?.getContext('2d');
+            if (!ctx) return;
+            
+            if (sweeteningChart) {
+                sweeteningChart.destroy();
+            }
+            
+            sweeteningChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Spirit', 'Sugar Syrup'],
+                    datasets: [{
+                        data: [spiritVol, syrupVol],
+                        backgroundColor: ['#8B4513', '#D2691E'],
                         borderWidth: 1,
                         borderColor: '#fff'
                     }]
