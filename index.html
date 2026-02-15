@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-     <!-- Apple Touch Icon (the main one for home screen) -->
-<link rel="apple-touch-icon" href="logo.png">
-
-<!-- Optional: Prevents zooming when launching from home screen -->
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
-
+    <!-- Apple Touch Icon (the main one for home screen) -->
+    <link rel="apple-touch-icon" href="logo.png">
+    <!-- Optional: Prevents zooming when launching from home screen -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Spirit Dilution & Sweetening Calculator</title>
@@ -557,18 +555,112 @@
             color: #8B4513;
             font-size: 1rem;
         }
+
+        /* Proofing specific styles */
+        .proofing-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .proofing-header svg {
+            width: 24px;
+            height: 24px;
+            fill: none;
+            stroke: #1e4f8a;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        .proofing-badge {
+            background: #e8edf3;
+            color: #1e3a5f;
+            padding: 4px 10px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: inline-block;
+            margin-bottom: 10px;
+            border: 1px solid #cdd9e9;
+        }
+        .proofing-card {
+            border-left: 4px solid #1e4f8a;
+        }
+        .proofing-result-panel {
+            background: #132b41;
+            background: linear-gradient(135deg, #1a3349, #0e263b);
+            border-radius: 12px;
+            padding: 15px;
+            color: rgba(255,255,255,0.9);
+            margin-top: 15px;
+        }
+        .proofing-action-call {
+            font-size: 1.3rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+            padding-bottom: 10px;
+            margin-bottom: 12px;
+        }
+        .proofing-action-call span {
+            background: #ffb347;
+            color: #1d2c3a;
+            font-weight: 700;
+            font-size: 1.6rem;
+            padding: 0 10px;
+            border-radius: 40px;
+            line-height: 1.3;
+        }
+        .proofing-detail-line {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px dashed rgba(255,255,255,0.1);
+            font-size: 0.95rem;
+        }
+        .proofing-detail-line .proofing-value {
+            font-weight: 600;
+            background: rgba(255,255,255,0.08);
+            padding: 2px 10px;
+            border-radius: 40px;
+            color: white;
+        }
+        .proofing-ethanol-highlight {
+            background: #ffe7c7;
+            color: #1d3d5c;
+            padding: 10px 12px;
+            border-radius: 12px;
+            margin: 12px 0;
+            font-weight: 500;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .proofing-ethanol-highlight .proofing-ethanol-number {
+            font-size: 1.3rem;
+            font-weight: 700;
+            background: #ffffffb0;
+            padding: 3px 15px;
+            border-radius: 40px;
+            color: #0f2f45;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1><i class="fas fa-cocktail"></i> Spirit Calculators 🐑</h1>
-            <div class="header-subtitle">Dilution & Sweetening Calculator</div>
+            <div class="header-subtitle">Dilution & Sweetening & Proofing</div>
         </header>
         
         <div class="calculator-switch">
             <div class="calc-tab active" id="dilution-tab">Dilution</div>
             <div class="calc-tab" id="sweetening-tab">Sweetening</div>
+            <div class="calc-tab" id="proofing-tab">Proofing</div>
         </div>
         
         <!-- Dilution Calculator -->
@@ -657,13 +749,6 @@
         
         <!-- Sweetening Calculator -->
         <div class="calculator-section" id="sweetening-calculator">
-            <div class="warning-box">
-                <div class="warning-title">
-                    <i class="fas fa-exclamation-triangle"></i> Important Warning
-                </div>
-                <div>Never add dry sugar directly to alcohol! You must first make sugar syrup. Dry sugar won't dissolve properly in high-proof alcohol and can create crystallization and separation issues.</div>
-            </div>
-            
             <div class="card sweetening-card">
                 <h2 class="section-title"><i class="fas fa-candy-cane"></i> Sweetening Calculator</h2>
                 
@@ -786,6 +871,103 @@
                     <canvas id="sweeteningChart"></canvas>
                 </div>
             </div>
+            
+            <!-- Warning at the bottom of Sweetening calculator -->
+            <div class="warning-box">
+                <div class="warning-title">
+                    <i class="fas fa-exclamation-triangle"></i> Important Warning
+                </div>
+                <div>Never add dry sugar directly to alcohol! You must first make sugar syrup. Dry sugar won't dissolve properly in high-proof alcohol and can create crystallization and separation issues.</div>
+            </div>
+        </div>
+
+        <!-- Proofing Calculator -->
+        <div class="calculator-section" id="proofing-calculator">
+            <div class="card proofing-card">
+                <div class="proofing-header">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M5 12h14M12 5v14M7 7l10 10M17 7l-10 10" stroke="currentColor" stroke-width="1.8" />
+                        <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8" fill="none" />
+                    </svg>
+                    <h2 class="section-title" style="margin-bottom: 0;">Proofing Calculator</h2>
+                </div>
+                <div class="proofing-badge">⚗️ spirit blending · pearson's square</div>
+                
+                <div class="input-grid">
+                    <div class="input-container">
+                        <label for="proof-volInitial">Initial Volume</label>
+                        <div class="input-with-unit">
+                            <input type="number" id="proof-volInitial" step="0.1" min="0" value="0" placeholder="0" inputmode="decimal">
+                            <span class="unit">ml</span>
+                        </div>
+                        <div class="input-info">Volume of base liquid</div>
+                    </div>
+                    
+                    <div class="input-container">
+                        <label for="proof-abvInitial">Initial ABV</label>
+                        <div class="input-with-unit">
+                            <input type="number" id="proof-abvInitial" step="0.1" min="0" max="100" value="0" placeholder="0" inputmode="decimal">
+                            <span class="unit">%</span>
+                        </div>
+                        <div class="input-info">Current strength</div>
+                    </div>
+                    
+                    <div class="input-container">
+                        <label for="proof-abvFinal">Final ABV</label>
+                        <div class="input-with-unit">
+                            <input type="number" id="proof-abvFinal" step="0.1" min="0" max="100" value="0" placeholder="0" inputmode="decimal">
+                            <span class="unit">%</span>
+                        </div>
+                        <div class="input-info">Desired target</div>
+                    </div>
+                    
+                    <div class="input-container">
+                        <label for="proof-abvSpirit">Spirit ABV</label>
+                        <div class="input-with-unit">
+                            <input type="number" id="proof-abvSpirit" step="0.1" min="0" max="100" value="0" placeholder="0" inputmode="decimal">
+                            <span class="unit">%</span>
+                        </div>
+                        <div class="input-info">High-proof spirit to add</div>
+                    </div>
+                </div>
+                
+                <button class="reset-btn" id="proof-reset-btn">
+                    <i class="fas fa-redo"></i> Reset Proofing
+                </button>
+            </div>
+            
+            <div class="card proofing-card">
+                <h2 class="section-title"><i class="fas fa-flask"></i> Proofing Results</h2>
+                
+                <div class="proofing-result-panel" id="proofResultPanel">
+                    <div class="proofing-action-call">
+                        <span>➕</span> Add <strong id="proof-spiritVolumeResult">0</strong> ml spirit
+                    </div>
+                    
+                    <div class="proofing-detail-line">
+                        <span>📦 base liquid</span>
+                        <span class="proofing-value" id="proof-baseDescription">0 ml at 0% ABV</span>
+                    </div>
+                    
+                    <div class="proofing-ethanol-highlight">
+                        <span>⚡ ethanol content</span>
+                        <span class="proofing-ethanol-number" id="proof-ethanolPure">0 ml</span>
+                    </div>
+                    
+                    <div class="proofing-detail-line">
+                        <span>➕ added spirit</span>
+                        <span class="proofing-value" id="proof-addedSpiritDesc">0 ml at 0% ABV</span>
+                    </div>
+                    
+                    <div class="proofing-detail-line" style="border-bottom: 2px solid rgba(255,255,255,0.2); padding-bottom: 10px;">
+                        <span>🧪 final blend</span>
+                        <span class="proofing-value" id="proof-finalBlendDesc">0 ml at 0% ABV</span>
+                    </div>
+                </div>
+                
+                <!-- error / warning message -->
+                <div class="error-message" id="proof-errorMessage"></div>
+            </div>
         </div>
         
         <div class="card syrup-guide-card">
@@ -827,6 +1009,10 @@
             
             <div class="dropdown-content" id="guide-content">
                 <ol class="steps-list">
+                    <li><strong>Enter Your Base Liquid:</strong> Input the Initial Volume (ml) and its current Initial ABV (%).</li>
+                    <li><strong>Set Your Target:</strong> Specify the desired Final ABV (%) for your blend.</li>
+                    <li><strong>Define Your Spirit:</strong> Enter the Spirit ABV (%) of the high-proof alcohol you will be adding.</li>
+                    <li><strong>Read the Result:</strong> See exactly how much spirit to add and the final blend details.</li>
                     <li><strong>Measure your distillate</strong> precisely using a graduated cylinder</li>
                     <li><strong>Chill both distillate and water</strong> to prevent louche effect (cloudiness)</li>
                     <li><strong>Add <span class="highlight" id="step-water">0 mL</span> of water</strong> slowly in stages</li>
@@ -893,6 +1079,13 @@
         const sugarOptions = document.querySelectorAll('.sugar-option');
         const sweetResetBtn = document.getElementById('sweet-reset-btn');
         
+        // Proofing calculator elements
+        const proofVolInit = document.getElementById('proof-volInitial');
+        const proofAbvInit = document.getElementById('proof-abvInitial');
+        const proofAbvFinal = document.getElementById('proof-abvFinal');
+        const proofAbvSpirit = document.getElementById('proof-abvSpirit');
+        const proofResetBtn = document.getElementById('proof-reset-btn');
+        
         // Results elements
         const waterResult = document.getElementById('water-result');
         const volumeResult = document.getElementById('volume-result');
@@ -915,6 +1108,14 @@
         const syrupSugar = document.getElementById('syrup-sugar');
         const syrupWaterResult = document.getElementById('syrup-water-result');
         
+        // Proofing results elements
+        const proofSpiritVolume = document.getElementById('proof-spiritVolumeResult');
+        const proofBaseDesc = document.getElementById('proof-baseDescription');
+        const proofEthanol = document.getElementById('proof-ethanolPure');
+        const proofAddedDesc = document.getElementById('proof-addedSpiritDesc');
+        const proofFinalDesc = document.getElementById('proof-finalBlendDesc');
+        const proofErrorDiv = document.getElementById('proof-errorMessage');
+        
         // Step-by-step elements
         const stepWater = document.getElementById('step-water');
         
@@ -934,8 +1135,10 @@
         // Calculator tabs
         const dilutionTab = document.getElementById('dilution-tab');
         const sweeteningTab = document.getElementById('sweetening-tab');
+        const proofingTab = document.getElementById('proofing-tab');
         const dilutionCalc = document.getElementById('dilution-calculator');
         const sweeteningCalc = document.getElementById('sweetening-calculator');
+        const proofingCalc = document.getElementById('proofing-calculator');
         
         // Charts
         let dilutionChart = null;
@@ -950,15 +1153,28 @@
             dilutionTab.addEventListener('click', function() {
                 dilutionTab.classList.add('active');
                 sweeteningTab.classList.remove('active');
+                proofingTab.classList.remove('active');
                 dilutionCalc.classList.add('active');
                 sweeteningCalc.classList.remove('active');
+                proofingCalc.classList.remove('active');
             });
             
             sweeteningTab.addEventListener('click', function() {
                 sweeteningTab.classList.add('active');
                 dilutionTab.classList.remove('active');
+                proofingTab.classList.remove('active');
                 sweeteningCalc.classList.add('active');
                 dilutionCalc.classList.remove('active');
+                proofingCalc.classList.remove('active');
+            });
+
+            proofingTab.addEventListener('click', function() {
+                proofingTab.classList.add('active');
+                dilutionTab.classList.remove('active');
+                sweeteningTab.classList.remove('active');
+                proofingCalc.classList.add('active');
+                dilutionCalc.classList.remove('active');
+                sweeteningCalc.classList.remove('active');
             });
             
             // Auto-calculate when inputs change (dilution)
@@ -976,6 +1192,22 @@
             spiritAbv.addEventListener('input', calculateSweetening);
             sweetnessLevel.addEventListener('change', calculateSweetening);
             syrupRatioSelect.addEventListener('change', calculateSweetening);
+            
+            // Auto-calculate when inputs change (proofing)
+            [proofVolInit, proofAbvInit, proofAbvFinal, proofAbvSpirit].forEach(el => {
+                el.addEventListener('input', calculateProofing);
+                el.addEventListener('blur', function() {
+                    if (el === proofAbvInit || el === proofAbvFinal || el === proofAbvSpirit) {
+                        let val = parseFloat(el.value) || 0;
+                        if (val > 100) el.value = 100;
+                        if (val < 0) el.value = 0;
+                    }
+                    if (el === proofVolInit) {
+                        if ((parseFloat(el.value) || 0) < 0) el.value = 0;
+                    }
+                    calculateProofing();
+                });
+            });
             
             // Sugar type selection
             sugarOptions.forEach(option => {
@@ -1067,6 +1299,14 @@
                     sweeteningChart.destroy();
                     sweeteningChart = null;
                 }
+            });
+
+            proofResetBtn.addEventListener('click', function() {
+                proofVolInit.value = 0;
+                proofAbvInit.value = 0;
+                proofAbvFinal.value = 0;
+                proofAbvSpirit.value = 0;
+                calculateProofing();
             });
         });
         
@@ -1222,6 +1462,85 @@
             
             // Update chart
             updateSweeteningChart(volume, totalSyrupVolume, finalTotalVolume);
+        }
+        
+        // Calculate proofing function
+        function calculateProofing() {
+            // read inputs
+            let V1 = parseFloat(proofVolInit.value) || 0;
+            let A1 = parseFloat(proofAbvInit.value) || 0;
+            let Af = parseFloat(proofAbvFinal.value) || 0;
+            let A2 = parseFloat(proofAbvSpirit.value) || 0;
+
+            // cap percentages to 100
+            A1 = Math.min(A1, 100);
+            Af = Math.min(Af, 100);
+            A2 = Math.min(A2, 100);
+
+            // sync back capped values
+            proofAbvInit.value = A1;
+            proofAbvFinal.value = Af;
+            proofAbvSpirit.value = A2;
+
+            // hide previous error
+            proofErrorDiv.classList.remove('show');
+            proofErrorDiv.innerText = '';
+
+            // --- Validation & edge cases ---
+            if (V1 === 0 && A1 === 0 && Af === 0 && A2 === 0) {
+                renderProofingResults(0, V1, A1, Af, A2);
+                return;
+            }
+
+            if (Math.abs(Af - A1) < 1e-9) {
+                renderProofingResults(0, V1, A1, Af, A2);
+                return;
+            }
+
+            if (Math.abs(A2 - Af) < 1e-9) {
+                let msg = (A2 === Af) ? 'Spirit ABV equals final ABV — can\'t change concentration.' : 'Spirit ABV too close to final ABV.';
+                proofErrorDiv.innerText = '⚠️ ' + msg;
+                proofErrorDiv.classList.add('show');
+                renderProofingResults(0, V1, A1, Af, A2);
+                return;
+            }
+
+            let numerator = (Af - A1);
+            let denominator = (A2 - Af);
+            let V2 = (denominator !== 0) ? (V1 * numerator / denominator) : 0;
+
+            if (V2 < -1e-9) {
+                proofErrorDiv.innerText = '⚠️ target ABV not reachable by adding this spirit (negative amount).';
+                proofErrorDiv.classList.add('show');
+                renderProofingResults(0, V1, A1, Af, A2);
+                return;
+            }
+
+            if (V2 < 0 && V2 > -1e-6) V2 = 0;
+
+            renderProofingResults(V2, V1, A1, Af, A2);
+        }
+
+        function renderProofingResults(V2, V1, A1, Af, A2) {
+            let roundedV2 = (Math.abs(V2) < 0.01) ? 0 : Math.round(V2 * 100) / 100;
+            if (V2 < 0) roundedV2 = 0;
+
+            let ethanolBase = (V1 * A1) / 100;
+            let ethanolSpirit = (roundedV2 * A2) / 100;
+            let ethanolTotal = ethanolBase + ethanolSpirit;
+            let totalVolume = V1 + roundedV2;
+            let blendedAbv = totalVolume > 1e-9 ? (ethanolTotal / totalVolume) * 100 : 0;
+            let blendedAbvDisplay = Math.round(blendedAbv * 100) / 100;
+
+            let v1Display = Math.round(V1 * 100) / 100;
+            let a1Display = Math.round(A1 * 100) / 100;
+            let a2Display = Math.round(A2 * 100) / 100;
+
+            proofSpiritVolume.innerText = roundedV2;
+            proofBaseDesc.innerText = `${v1Display} ml at ${a1Display}% ABV`;
+            proofEthanol.innerText = ethanolTotal.toFixed(2) + ' ml';
+            proofAddedDesc.innerText = `${roundedV2} ml at ${a2Display}% ABV`;
+            proofFinalDesc.innerText = `${totalVolume.toFixed(2)} ml at ${blendedAbvDisplay}% ABV`;
         }
         
         // Helper function to animate result updates
